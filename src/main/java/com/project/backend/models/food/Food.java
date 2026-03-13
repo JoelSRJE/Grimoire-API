@@ -1,0 +1,14 @@
+package com.project.backend.models.food;
+
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
+@Entity
+@Table(name = "users")
+@Getter
+@Setter
+public class Food {
+
+
+}
