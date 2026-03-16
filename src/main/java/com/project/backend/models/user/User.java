@@ -22,7 +22,7 @@ public class User {
     private String email;
 
     @Column(nullable = false)
-    private String password;
+    private String hashedPassword;
 
     @Column(nullable = false)
     private AccountType accountType;
@@ -30,13 +30,20 @@ public class User {
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
+    @Column(nullable = false)
+    private boolean isOnline;
+
+    @Column(nullable = true)
+    @Transient
+    private String authToken;
+
     public User() {}
 
-    public User(String email, String password) {
-        this.userId = UUID.randomUUID();
+    public User(String email, String hashedPassword) {
         this.email = email;
-        this.password = password;
+        this.hashedPassword = hashedPassword;
         this.accountType = AccountType.USER;
         this.createdAt = LocalDateTime.now();
+        this.isOnline = false;
     }
 }

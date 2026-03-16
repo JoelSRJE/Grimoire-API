@@ -24,7 +24,7 @@ public class JWTService {
                 .build();
     }
 
-    private String generateToken(UUID userId) {
+    public String generateToken(UUID userId) {
         return JWT.create()
                 .withIssuer("backend")
                 .withIssuedAt(Instant.now())

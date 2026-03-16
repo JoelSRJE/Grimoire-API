@@ -27,7 +27,6 @@ public class Food {
     public Food() {}
 
     public Food(String foodName, List<Ingredient> ingredientList) {
-        this.foodId = UUID.randomUUID();
         this.foodName = foodName;
         this.ingredientList = ingredientList;
     }

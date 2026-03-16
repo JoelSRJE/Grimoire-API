@@ -27,7 +27,6 @@ public class Ingredient {
     public Ingredient() {}
 
     public Ingredient(String ingredientName) {
-        this.ingredientId = UUID.randomUUID();
         this.ingredientName = ingredientName;
     }
 }
