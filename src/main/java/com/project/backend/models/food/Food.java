@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -18,16 +20,24 @@ public class Food {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID foodId;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String foodName;
 
+    @Column()
+    private FoodType foodType;
+
     @OneToMany(mappedBy = "food", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Ingredient> ingredientList;
+    private List<Ingredient> ingredientList = new ArrayList<>();
+
+    @Column(nullable = false)
+    private LocalDateTime createdAt;
 
     public Food() {}
 
-    public Food(String foodName, List<Ingredient> ingredientList) {
+    public Food(String foodName, FoodType foodType ,List<Ingredient> ingredientList) {
         this.foodName = foodName;
+        this.foodType = foodType;
         this.ingredientList = ingredientList;
+        this.createdAt = LocalDateTime.now();
     }
 }

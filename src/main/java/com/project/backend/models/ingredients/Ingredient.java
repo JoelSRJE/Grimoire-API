@@ -17,10 +17,10 @@ public class Ingredient {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID ingredientId;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String ingredientName;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "food_id")
     private Food food;
 
