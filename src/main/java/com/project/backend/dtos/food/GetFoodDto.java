@@ -21,7 +21,10 @@ public record GetFoodDto(
                 food.getFoodName(),
                 food.getFoodType(),
                 food.getIngredientList().stream()
-                                .map(ing -> new IngredientDto(ing.getIngredientName()))
+                                .map(ing -> new IngredientDto(
+                                        ing.getIngredientId(),
+                                        ing.getIngredientName()
+                                ))
                                         .toList(),
                 food.getCreatedAt()
         );

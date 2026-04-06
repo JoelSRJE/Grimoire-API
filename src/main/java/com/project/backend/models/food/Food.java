@@ -1,6 +1,7 @@
 package com.project.backend.models.food;
 
 import com.project.backend.models.ingredients.Ingredient;
+import com.project.backend.models.user.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -32,12 +33,16 @@ public class Food {
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
+    @Column(nullable = false)
+    private UUID owner;
+
     public Food() {}
 
-    public Food(String foodName, FoodType foodType ,List<Ingredient> ingredientList) {
+    public Food(String foodName, FoodType foodType ,List<Ingredient> ingredientList, UUID owner) {
         this.foodName = foodName;
         this.foodType = foodType;
         this.ingredientList = ingredientList;
         this.createdAt = LocalDateTime.now();
+        this.owner = owner;
     }
 }

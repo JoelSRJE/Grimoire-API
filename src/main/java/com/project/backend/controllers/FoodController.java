@@ -3,16 +3,17 @@ package com.project.backend.controllers;
 import com.project.backend.dtos.food.GetFoodDto;
 import com.project.backend.dtos.food.RegisterFoodDto;
 import com.project.backend.models.food.Food;
+import com.project.backend.models.user.User;
 import com.project.backend.requests.food.RegisterFoodRequest;
 import com.project.backend.requests.food.UpdateFoodRequest;
 import com.project.backend.services.food.FoodService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/food")
@@ -24,9 +25,10 @@ public class FoodController {
 
     @PostMapping
     public ResponseEntity<RegisterFoodDto> registerFood(
-            @RequestBody RegisterFoodRequest request
+            @RequestBody RegisterFoodRequest request,
+            @AuthenticationPrincipal User authenticatedUser
             ) {
-        Food food = foodService.registerFood(request);
+        Food food = foodService.registerFood(request, authenticatedUser);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(RegisterFoodDto.from(food));
     }
@@ -62,12 +64,5 @@ public class FoodController {
                 .toList();
 
         return ResponseEntity.ok(updatedFoodDtos);
-    }
-
-    @DeleteMapping("/{foodId}")
-    public ResponseEntity<String> deleteFood(@PathVariable UUID foodId) {
-        String response = foodService.deleteFood(foodId);
-
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(response);
     }
 }

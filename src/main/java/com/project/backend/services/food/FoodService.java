@@ -4,6 +4,7 @@ import com.project.backend.dtos.food.GetFoodDto;
 import com.project.backend.exceptions.food.*;
 import com.project.backend.models.food.Food;
 import com.project.backend.models.ingredients.Ingredient;
+import com.project.backend.models.user.User;
 import com.project.backend.repositories.FoodRepository;
 import com.project.backend.requests.food.RegisterFoodRequest;
 import com.project.backend.requests.food.UpdateFoodRequest;
@@ -26,7 +27,7 @@ public class FoodService implements IFoodService {
 
     @Override
     @Transactional
-    public Food registerFood(RegisterFoodRequest request) {
+    public Food registerFood(RegisterFoodRequest request, User authenticatedUser) {
 
         if (request.foodName() == null || request.foodName().isBlank()) {
             throw new FoodNameIsNullException();
@@ -48,6 +49,7 @@ public class FoodService implements IFoodService {
         food.setFoodName(request.foodName());
         food.setFoodType(request.foodType());
         food.setCreatedAt(LocalDateTime.now());
+        food.setOwner(authenticatedUser.getUserId());
 
         List<Ingredient> ingredients = request.ingredients().stream()
                 .filter(Objects::nonNull)
