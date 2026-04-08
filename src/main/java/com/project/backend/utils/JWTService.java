@@ -7,8 +7,10 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.security.SecureRandom;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Base64;
 import java.util.UUID;
 
 @Service
@@ -17,11 +19,23 @@ public class JWTService {
     private final Algorithm algorithm;
     private final JWTVerifier jwtVerifier;
 
-    public JWTService(@Value("${JWT_SECRET}") String secret) {
+    public JWTService(@Value("${JWT_SECRET:}") String secret) {
+
+        if (secret == null || secret.isBlank()) {
+            secret = generateJWTSecret();
+        }
+
         this.algorithm = Algorithm.HMAC256(secret);
         this.jwtVerifier = JWT.require(this.algorithm)
                 .withIssuer("backend")
                 .build();
+    }
+
+    private String generateJWTSecret() {
+        SecureRandom random = new SecureRandom();
+        byte[] bytes = new byte[64];
+        random.nextBytes(bytes);
+        return Base64.getEncoder().encodeToString(bytes);
     }
 
     public String generateToken(UUID userId) {
@@ -39,6 +53,5 @@ public class JWTService {
 
         return UUID.fromString(decodedJWT.getSubject());
     }
-
 
 }
