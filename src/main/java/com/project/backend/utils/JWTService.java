@@ -20,24 +20,24 @@ public class JWTService {
     private final JWTVerifier jwtVerifier;
 
     public JWTService(@Value("${JWT_SECRET:}") String secret) {
-
+/*
         if (secret == null || secret.isBlank()) {
             secret = generateJWTSecret();
-        }
+        }*/
 
         this.algorithm = Algorithm.HMAC256(secret);
         this.jwtVerifier = JWT.require(this.algorithm)
                 .withIssuer("backend")
                 .build();
     }
-
+/*
     private String generateJWTSecret() {
         SecureRandom random = new SecureRandom();
         byte[] bytes = new byte[64];
         random.nextBytes(bytes);
         return Base64.getEncoder().encodeToString(bytes);
     }
-
+*/
     public String generateToken(UUID userId) {
         return JWT.create()
                 .withIssuer("backend")

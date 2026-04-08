@@ -1,22 +1,20 @@
 package com.project.backend.services.food;
 
-import com.project.backend.dtos.food.GetFoodDto;
 import com.project.backend.exceptions.food.*;
 import com.project.backend.models.food.Food;
 import com.project.backend.models.ingredients.Ingredient;
 import com.project.backend.models.user.User;
 import com.project.backend.repositories.FoodRepository;
+import com.project.backend.requests.food.DeleteFoodsRequest;
 import com.project.backend.requests.food.RegisterFoodRequest;
 import com.project.backend.requests.food.UpdateFoodRequest;
+import com.project.backend.services.ingredient.IngredientService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,6 +22,7 @@ import java.util.stream.Collectors;
 public class FoodService implements IFoodService {
 
     private final FoodRepository foodRepository;
+    private final IngredientService ingredientService;
 
     @Override
     @Transactional
@@ -89,14 +88,10 @@ public class FoodService implements IFoodService {
     }
 
     @Override
-    public List<Food> getAllFoods() {
-        List<Food> foodList = foodRepository.findAll();
+    public List<Food> getAllFoods(User authenticatedUser) {
+        List<Food> foodList = foodRepository.findAllByOwner(authenticatedUser.getUserId());
 
-        if (foodList == null || foodList.isEmpty()) {
-            throw new FoodListIsEmptyException();
-        }
-
-        return foodList;
+        return foodList != null ? foodList : new ArrayList<>();
     }
 
     @Override
@@ -116,16 +111,17 @@ public class FoodService implements IFoodService {
                         food.setFoodName(item.foodName());
                     }
 
-                    if (item.ingredients() != null && !item.ingredients().isEmpty()) {
+                    if (item.ingredients() != null) {
                         food.getIngredientList().clear();
-                        List<Ingredient> updatedIngredients = item.ingredients().stream()
-                                .map(ingReq -> {
+
+                        item.ingredients().stream()
+                                .filter(ingReq -> ingReq.ingredientName() != null && !ingReq.ingredientName().isBlank())
+                                .forEach(ingReq -> {
                                     Ingredient ingredient = new Ingredient();
                                     ingredient.setIngredientName(ingReq.ingredientName());
                                     ingredient.setFood(food);
-                                    return ingredient;
-                                }).toList();
-                        food.setIngredientList(updatedIngredients);
+                                    food.getIngredientList().add(ingredient);
+                                });
                     }
 
                     return foodRepository.save(food);
@@ -147,4 +143,28 @@ public class FoodService implements IFoodService {
 
         return "Successfully deleted object: " + foundFood.get().getFoodName() + "!";
     }
+
+    @Override
+    @Transactional
+    public String deleteFoods(DeleteFoodsRequest request) {
+
+        if (request.foodIds() == null || request.foodIds().isEmpty()) {
+            throw new FoodListIsEmptyException();
+        }
+
+        List<UUID> foodUUIDs = request.foodIds().stream()
+                .map(UUID::fromString)
+                .toList();
+
+        List<Food> foodsToDelete = foodRepository.findAllById(foodUUIDs);
+
+        if (foodsToDelete.isEmpty()) {
+            throw new FoodListIsEmptyException();
+        }
+
+        foodRepository.deleteAll(foodsToDelete);
+
+        return "Successfully deleted: " + foodsToDelete.stream().count();
+    }
+
 }

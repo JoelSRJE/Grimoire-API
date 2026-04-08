@@ -1,9 +1,11 @@
 package com.project.backend.controllers;
 
+import com.project.backend.dtos.food.DeleteFoodDto;
 import com.project.backend.dtos.food.GetFoodDto;
 import com.project.backend.dtos.food.RegisterFoodDto;
 import com.project.backend.models.food.Food;
 import com.project.backend.models.user.User;
+import com.project.backend.requests.food.DeleteFoodsRequest;
 import com.project.backend.requests.food.RegisterFoodRequest;
 import com.project.backend.requests.food.UpdateFoodRequest;
 import com.project.backend.services.food.FoodService;
@@ -21,7 +23,6 @@ import java.util.List;
 public class FoodController {
 
     private final FoodService foodService;
-
 
     @PostMapping
     public ResponseEntity<RegisterFoodDto> registerFood(
@@ -43,8 +44,10 @@ public class FoodController {
     }
 
     @GetMapping
-    public ResponseEntity<List<GetFoodDto>> getAllFoods() {
-        List<Food> foodList = foodService.getAllFoods();
+    public ResponseEntity<List<GetFoodDto>> getAllFoods(
+            @AuthenticationPrincipal User authenticatedUser
+    ) {
+        List<Food> foodList = foodService.getAllFoods(authenticatedUser);
 
         List<GetFoodDto> foodDtoList = foodList.stream()
                 .map(GetFoodDto::from)
@@ -53,9 +56,10 @@ public class FoodController {
         return ResponseEntity.ok(foodDtoList);
     }
 
-    @PutMapping("/{foodId}")
-    public ResponseEntity<List<GetFoodDto>> updateFood(
-            @RequestBody UpdateFoodRequest request
+    @PutMapping("/update-several")
+    public ResponseEntity<List<GetFoodDto>> updateMultipleFoods(
+            @RequestBody UpdateFoodRequest request,
+            @AuthenticationPrincipal User authenticatedUser
             ) {
         List<Food> updatedFoodList = foodService.updateFood(request);
 
@@ -64,5 +68,16 @@ public class FoodController {
                 .toList();
 
         return ResponseEntity.ok(updatedFoodDtos);
+    }
+
+    @DeleteMapping("delete-several")
+    public ResponseEntity<DeleteFoodDto> deleteSeveralDifferentFoods(
+            @RequestBody DeleteFoodsRequest request,
+            @AuthenticationPrincipal User authenticatedUser
+            ) {
+
+        String message = foodService.deleteFoods(request);
+
+        return ResponseEntity.ok(DeleteFoodDto.from(message));
     }
 }

@@ -9,6 +9,7 @@ import com.project.backend.requests.user.RegisterUserRequest;
 import com.project.backend.models.user.User;
 import com.project.backend.requests.user.UpdateUserRequest;
 import com.project.backend.services.user.UserService;
+import com.project.backend.utils.JWTService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +24,7 @@ import java.util.UUID;
 public class UserController {
 
     private final UserService userService;
+    private final JWTService jWTService;
 
     @PostMapping()
     public ResponseEntity<RegisteredUserDto> registerUser(
